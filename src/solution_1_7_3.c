@@ -3,6 +3,7 @@
 #include <linux/slab.h>
 #include "checker.h"
 
+/*----------------------------------------------------------------------------*/
 
 static int __init sol_init(void)
 {
@@ -13,8 +14,10 @@ static int __init sol_init(void)
 
 	CHECKER_MACRO;
 
-	for (i = 2; i < 15; i++) {
+    for (i = 2; i < 15; i++)
+    {
 		arr = kmalloc(i, GFP_KERNEL);
+
 		for (j = 0; j < i; j++)
 			arr[j] = 10;
 
@@ -26,9 +29,13 @@ static int __init sol_init(void)
 		generate_output(sum, arr, i, buf);
 
 		if (tmp_sum == sum) 
-			printk(KERN_INFO "%s", buf);
+        {
+            printk(KERN_INFO "%s", buf);
+        }
 		else
-			printk(KERN_ERR "%s", buf);
+        {
+            printk(KERN_ERR "%s", buf);
+        }
 
 		kfree(arr);
 		tmp_sum = 0;
@@ -37,12 +44,18 @@ static int __init sol_init(void)
 	return 0;
 }
 
+/*----------------------------------------------------------------------------*/
+
 static void __exit sol_exit(void)
 {
 	CHECKER_MACRO;
 }
 
+/*----------------------------------------------------------------------------*/
+
 module_init(sol_init);
 module_exit(sol_exit);
 
 MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Kirill Yustitskii <inst: yustitskii_kirill>");
+MODULE_DESCRIPTION("Stepik solution");
