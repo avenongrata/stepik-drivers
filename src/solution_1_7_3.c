@@ -7,48 +7,48 @@
 
 static int __init sol_init(void)
 {
-	int i, j;
-	char buf[1000];
-	short *arr = NULL;
-	int sum, tmp_sum = 0;
+    int i, j;
+    char buf[1000];
+    short *arr = NULL;
+    int sum, tmp_sum = 0;
 
-	CHECKER_MACRO;
+    CHECKER_MACRO;
 
     for (i = 2; i < 15; i++)
     {
-		arr = kmalloc(i, GFP_KERNEL);
+        arr = kmalloc(i, GFP_KERNEL);
 
-		for (j = 0; j < i; j++)
-			arr[j] = 10;
+        for (j = 0; j < i; j++)
+            arr[j] = 10;
 
-		sum = array_sum(arr, i);
+        sum = array_sum(arr, i);
 
-		for (j = 0; j < i; j++) 
-			tmp_sum += arr[j];
+        for (j = 0; j < i; j++)
+            tmp_sum += arr[j];
 
-		generate_output(sum, arr, i, buf);
+        generate_output(sum, arr, i, buf);
 
-		if (tmp_sum == sum) 
+        if (tmp_sum == sum)
         {
             printk(KERN_INFO "%s", buf);
         }
-		else
+        else
         {
             printk(KERN_ERR "%s", buf);
         }
 
-		kfree(arr);
-		tmp_sum = 0;
-	}
+        kfree(arr);
+        tmp_sum = 0;
+    }
 
-	return 0;
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
 
 static void __exit sol_exit(void)
 {
-	CHECKER_MACRO;
+    CHECKER_MACRO;
 }
 
 /*----------------------------------------------------------------------------*/

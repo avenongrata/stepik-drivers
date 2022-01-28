@@ -20,28 +20,28 @@ struct kobject * sol_kobj;
 
 struct sol_array
 {
-	char *array[100];
-	int count;
+    char *array[100];
+    int count;
 };
 
 /*----------------------------------------------------------------------------*/
 
 static int sol_compare(int elem_index, char ** array, int count)
 {
-	int i, ret;
-	int new_index = -1;
+    int i, ret;
+    int new_index = -1;
 
     for (i = 0; i < count; i++)
     {
         /* same string */
         if (elem_index == count)
-			continue;
+            continue;
 
         /* empty string */
         if (array[i] == NULL)
-			continue;
+            continue;
 
-		ret = strcmp(array[elem_index], array[i]);
+        ret = strcmp(array[elem_index], array[i]);
 
         /* equal or smaller */
         if (!ret || ret < 0)
@@ -50,12 +50,12 @@ static int sol_compare(int elem_index, char ** array, int count)
         }
         else
         {
-			new_index = i;
-			break;
-		}
-	}
+            new_index = i;
+            break;
+        }
+    }
 
-	if (new_index == -1)
+    if (new_index == -1)
     {
         return elem_index;
     }
@@ -71,33 +71,33 @@ static struct sol_array * fill_array_with_strings(void)
     struct list_head * lst;
     struct module    * obj;
     struct sol_array * solarray;
-	unsigned int len;
+    unsigned int len;
     int count = 0;
 
-	solarray = kmalloc(sizeof(struct sol_array), GFP_KERNEL);
+    solarray = kmalloc(sizeof(struct sol_array), GFP_KERNEL);
     if (!solarray)
     {
-		printk(KERN_INFO "kernel_mooc: can't alloc memmory for solarray\n");
-		return NULL;
-	}
+        printk(KERN_INFO "kernel_mooc: can't alloc memmory for solarray\n");
+        return NULL;
+    }
 
     /*------------------------------------------------------------------------*/
 
     list_for_each(lst, THIS_MODULE->list.prev)
     {
-		obj = list_entry(lst, struct module, list);
-		len = strlen(obj->name) + 1;
-		solarray->array[count] = kmalloc(len, GFP_KERNEL);
-		strcpy(solarray->array[count], obj->name);
-		count++;
-	}
+        obj = list_entry(lst, struct module, list);
+        len = strlen(obj->name) + 1;
+        solarray->array[count] = kmalloc(len, GFP_KERNEL);
+        strcpy(solarray->array[count], obj->name);
+        count++;
+    }
 
-	solarray->array[count] = NULL;
-	solarray->count = count;
+    solarray->array[count] = NULL;
+    solarray->count = count;
 
     /*------------------------------------------------------------------------*/
 
-	return solarray;
+    return solarray;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -105,54 +105,54 @@ static struct sol_array * fill_array_with_strings(void)
 static struct sol_array * sol_sort(void)
 {
     struct sol_array * solarray, * sorted;
-	int i;
-	unsigned int len;
-	int index, prev_index;
-	int count = 0;
+    int i;
+    unsigned int len;
+    int index, prev_index;
+    int count = 0;
 
-	sorted = kmalloc(sizeof(struct sol_array), GFP_KERNEL);
+    sorted = kmalloc(sizeof(struct sol_array), GFP_KERNEL);
     if (!sorted)
     {
         printk(KERN_INFO "kernel_mooc: can't alloc memmory for sorted\n");
-		return NULL;
-	}
+        return NULL;
+    }
 
     /*------------------------------------------------------------------------*/
 
-	solarray = fill_array_with_strings();
-	if (!solarray) 
-		return NULL;
+    solarray = fill_array_with_strings();
+    if (!solarray)
+        return NULL;
 
     /*------------------------------------------------------------------------*/
 
     for (i = 0; i < solarray->count; i++)
     {
-		if (solarray->array[i] == NULL)
-			continue;
+        if (solarray->array[i] == NULL)
+            continue;
 
-		index = i;
+        index = i;
         while (true)
         {
-			prev_index = index;
-			index = sol_compare(index, solarray->array, solarray->count);
+            prev_index = index;
+            index = sol_compare(index, solarray->array, solarray->count);
 
             /* if was already the smallest string */
             if (index == prev_index)
             {
-				len = strlen(solarray->array[index]) + 1;
-				sorted->array[count] = kmalloc(len, GFP_KERNEL);
-				strcpy(sorted->array[count], solarray->array[index]);
-				count ++;
+                len = strlen(solarray->array[index]) + 1;
+                sorted->array[count] = kmalloc(len, GFP_KERNEL);
+                strcpy(sorted->array[count], solarray->array[index]);
+                count ++;
                 kfree(solarray->array[index]);
-				solarray->array[index] = NULL;
-				i = -1;
+                solarray->array[index] = NULL;
+                i = -1;
 
-				break;
-			}
-		}
-	}
+                break;
+            }
+        }
+    }
 
-	sorted->count = solarray->count;
+    sorted->count = solarray->count;
 
     /*------------------------------------------------------------------------*/
 
@@ -160,45 +160,45 @@ static struct sol_array * sol_sort(void)
     kfree(solarray);
 
     /*------------------------------------------------------------------------*/
-	
-	return sorted;
+
+    return sorted;
 }
 
 /*----------------------------------------------------------------------------*/
 
 ssize_t sol_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
-	int count, tmp_count;
+    int count, tmp_count;
     struct sol_array * array;
-	int i;
+    int i;
 
-	array = sol_sort();
-	if (!array)
-		return 0;
+    array = sol_sort();
+    if (!array)
+        return 0;
 
     /*------------------------------------------------------------------------*/
 
-	tmp_count = 0;
-	count = 0;
+    tmp_count = 0;
+    count = 0;
 
     for (i = 0; i < array->count; i++)
     {
-		tmp_count = sprintf(buf, "%s\n", array->array[i]) + 1;
-		buf += tmp_count;
-		count += tmp_count;
-	}
+        tmp_count = sprintf(buf, "%s\n", array->array[i]) + 1;
+        buf += tmp_count;
+        count += tmp_count;
+    }
 
     /*------------------------------------------------------------------------*/
 
     /* free allocated memmory */
-	for (i = 0; i < array->count; i++)
-		kfree(array->array[i]);	 
+    for (i = 0; i < array->count; i++)
+        kfree(array->array[i]);
 
     kfree(array);
 
     /*------------------------------------------------------------------------*/
 
-	return count;
+    return count;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -206,23 +206,23 @@ ssize_t sol_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 ssize_t sol_store(struct kobject * kobj, struct kobj_attribute * attr,
                   const char * buf, size_t count)
 {
-	return 0;
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
 
 static struct kobj_attribute attr = 
-	__ATTR(my_sys, 0644, sol_show, sol_store);
+    __ATTR(my_sys, 0644, sol_show, sol_store);
 
 static struct attribute * attrs[] =
 {
-	&attr.attr,
-	NULL,
+    &attr.attr,
+    NULL,
 };
 
 static struct attribute_group grp =
 {
-	.attrs = attrs,
+    .attrs = attrs,
 };
 
 /*----------------------------------------------------------------------------*/
@@ -230,11 +230,11 @@ static struct attribute_group grp =
 static int __init sol_init(void)
 {
 
-	sol_kobj = kobject_create_and_add("my_kobject", kernel_kobj);
+    sol_kobj = kobject_create_and_add("my_kobject", kernel_kobj);
     if (!sol_kobj)
     {
-		printk(KERN_INFO "kernel_mooc: Can't create kobject\n");
-		return -1;
+        printk(KERN_INFO "kernel_mooc: Can't create kobject\n");
+        return -1;
     }
     else
     {
@@ -247,9 +247,9 @@ static int __init sol_init(void)
     {
         printk(KERN_INFO "kernel_mooc: Can't create attr "
                          "group in my_kobject\n");
-		kobject_put(sol_kobj);
+        kobject_put(sol_kobj);
 
-		return -1;
+        return -1;
     }
     else
     {
@@ -258,14 +258,14 @@ static int __init sol_init(void)
 
     /*------------------------------------------------------------------------*/
 
-	return 0;
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
 
 static void __exit sol_exit(void)
 {
-	kobject_put(sol_kobj);
+    kobject_put(sol_kobj);
 }
 
 /*----------------------------------------------------------------------------*/

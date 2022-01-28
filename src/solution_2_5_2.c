@@ -24,16 +24,16 @@ MODULE_PARM_DESC(b, "Allows you to set own \"c\" array");
 
 static int get_sum(void)
 {
-	int sum = 0;
-	int i;
+    int sum = 0;
+    int i;
 
-	sum += a;
-	sum += b;
+    sum += a;
+    sum += b;
 
-	for (i = 0; i < arr_len; i++)
-		sum += c[i]; 
+    for (i = 0; i < arr_len; i++)
+        sum += c[i];
 
-	return sum;
+    return sum;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -41,12 +41,12 @@ static int get_sum(void)
 ssize_t sol_show(struct kobject * kobj, struct kobj_attribute * attr,
                  char * buf)
 {
-	int sum;
+    int sum;
 
-	sum = get_sum();
-	sprintf(buf, "%d\n", sum);
+    sum = get_sum();
+    sprintf(buf, "%d\n", sum);
 
-	return strlen(buf);
+    return strlen(buf);
 
 }
 
@@ -55,7 +55,7 @@ ssize_t sol_show(struct kobject * kobj, struct kobj_attribute * attr,
 ssize_t sol_store(struct kobject * kobj, struct kobj_attribute * attr,
                   const char * buf, size_t count)
 {
-	return -EACCES;
+    return -EACCES;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -63,42 +63,42 @@ ssize_t sol_store(struct kobject * kobj, struct kobj_attribute * attr,
 struct kobject * sol_kobj;
 
 static struct kobj_attribute gr_attr = 
-	__ATTR(my_sys, 0664, sol_show, sol_store);
+    __ATTR(my_sys, 0664, sol_show, sol_store);
 
 static struct attribute * attrs[] =
 {
-	&gr_attr.attr,
-	NULL,
+    &gr_attr.attr,
+    NULL,
 };
 
 static struct attribute_group attr =
 {
-	.attrs = attrs,
+    .attrs = attrs,
 };
 
 /*----------------------------------------------------------------------------*/
 
 static int __init sol_init(void)
 {
-	sol_kobj = kobject_create_and_add("my_kobject", kernel_kobj);
-	if (!sol_kobj)
-		return -1;
+    sol_kobj = kobject_create_and_add("my_kobject", kernel_kobj);
+    if (!sol_kobj)
+        return -1;
 
     if (sysfs_create_group(sol_kobj, &attr))
     {
-		kobject_put(sol_kobj);
-		return -1;
-	}
+        kobject_put(sol_kobj);
+        return -1;
+    }
 
-	return 0;
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
 
 static void __exit sol_exit(void)
 {
-	sysfs_remove_group(sol_kobj, &attr);
-	kobject_put(sol_kobj);
+    sysfs_remove_group(sol_kobj, &attr);
+    kobject_put(sol_kobj);
 }
 
 /*----------------------------------------------------------------------------*/

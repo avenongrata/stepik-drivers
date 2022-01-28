@@ -32,24 +32,24 @@ static int sol_minor = 0;
 
 struct sol_st
 {
-	dev_t devt;
-	struct cdev cdev;
-	int str_len;
-	int str_sum;
+    dev_t devt;
+    struct cdev cdev;
+    int str_len;
+    int str_sum;
 } solst;
 
 /*----------------------------------------------------------------------------*/
 
 static int sol_open(struct inode * inode, struct file * filp)
 {
-	return 0;
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
 
 static int sol_release(struct inode * inode, struct file * filp)
 {
-	return 0;
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -59,46 +59,46 @@ static ssize_t sol_read(struct file * filp, char __user * buf, size_t count,
 {
     char * tbuf = NULL;
 
-	if (*pos != 0)
-		return 0;
+    if (*pos != 0)
+        return 0;
 
-	tbuf = kzalloc(1000, GFP_KERNEL);
+    tbuf = kzalloc(1000, GFP_KERNEL);
 
-	sprintf(tbuf, "%d %d\n", solst.str_len, solst.str_sum);
-	copy_to_user(buf, tbuf, strlen(tbuf));
-	*pos += strlen(tbuf);
+    sprintf(tbuf, "%d %d\n", solst.str_len, solst.str_sum);
+    copy_to_user(buf, tbuf, strlen(tbuf));
+    *pos += strlen(tbuf);
 
-	return strlen(tbuf);
+    return strlen(tbuf);
 }
 
 /*----------------------------------------------------------------------------*/
 
 static long sol_unlocked_ioctl(struct file * filp, unsigned int cmd,
                                unsigned long arg)
-{	
-	long tmp_num;
-	char *buf = NULL;
-	
-	buf = (char *)arg;
+{
+    long tmp_num;
+    char *buf = NULL;
+
+    buf = (char *)arg;
 
     switch(cmd)
     {
-	case SUM_LENGTH:
-		solst.str_len += strlen(buf);
-		return solst.str_len;
-		break;	
+    case SUM_LENGTH:
+        solst.str_len += strlen(buf);
+        return solst.str_len;
+        break;
 
-	case SUM_CONTENT:
-		kstrtol(buf, 10, &tmp_num);
-		solst.str_sum += tmp_num;
-		return solst.str_sum;
-		break;
+    case SUM_CONTENT:
+        kstrtol(buf, 10, &tmp_num);
+        solst.str_sum += tmp_num;
+        return solst.str_sum;
+        break;
 
-	default:
-		break;
-	}
+    default:
+        break;
+    }
 
-	return 0;
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -116,47 +116,47 @@ struct file_operations fops =
 
 static int __init sol_init(void)
 {
-	int ret;
+    int ret;
 
     /*------------------------------------------------------------------------*/
 
     if (sol_major == 240)
     {
-		solst.devt = MKDEV(sol_major, sol_minor);
-		ret = register_chrdev_region(solst.devt, 1, DRIVER_NAME);
+        solst.devt = MKDEV(sol_major, sol_minor);
+        ret = register_chrdev_region(solst.devt, 1, DRIVER_NAME);
     }
     else
     {
-		ret = alloc_chrdev_region(&solst.devt, sol_minor, 1, DRIVER_NAME);
-		sol_major = MAJOR(solst.devt);
-	}
+        ret = alloc_chrdev_region(&solst.devt, sol_minor, 1, DRIVER_NAME);
+        sol_major = MAJOR(solst.devt);
+    }
 
-	if (ret < 0)
-		return ret;
+    if (ret < 0)
+        return ret;
 
     /*------------------------------------------------------------------------*/
 
-	cdev_init(&solst.cdev, &fops);
-	solst.str_len = 0;
-	solst.str_sum = 0;
-	ret = cdev_add(&solst.cdev, solst.devt, 1);
+    cdev_init(&solst.cdev, &fops);
+    solst.str_len = 0;
+    solst.str_sum = 0;
+    ret = cdev_add(&solst.cdev, solst.devt, 1);
 
     if (ret < 0)
     {
-		unregister_chrdev_region(solst.devt, 1);
-		return ret;
-	}
+        unregister_chrdev_region(solst.devt, 1);
+        return ret;
+    }
 
     /*------------------------------------------------------------------------*/
 
-	return 0;
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
 
 static void __exit sol_exit(void)
 {
-	unregister_chrdev_region(solst.devt, 1);	
+    unregister_chrdev_region(solst.devt, 1);
 }
 
 /*----------------------------------------------------------------------------*/

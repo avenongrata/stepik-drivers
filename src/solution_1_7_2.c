@@ -6,8 +6,8 @@
 
 static int __init sol_init(void)
 {
-	call_me("Hello from my module!");
-	return 0;
+    call_me("Hello from my module!");
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
